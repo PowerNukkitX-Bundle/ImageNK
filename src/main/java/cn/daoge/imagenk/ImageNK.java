@@ -1,5 +1,7 @@
 package cn.daoge.imagenk;
 
+import cn.daoge.imagenk.storage.CachedImageStorage;
+import cn.daoge.imagenk.storage.LocalImageStorage;
 import cn.nukkit.plugin.PluginBase;
 import lombok.Getter;
 
@@ -13,6 +15,8 @@ public final class ImageNK extends PluginBase {
         instance = this;
     }
 
+    private CachedImageStorage storage;
+
     @Override
     public void onLoad() {
 
@@ -20,7 +24,9 @@ public final class ImageNK extends PluginBase {
 
     @Override
     public void onEnable() {
-
+        storage = new LocalImageStorage(this.getDataFolder().toPath().resolve("images"));
+        //预缓存图片
+        storage.cache();
     }
 
     @Override
