@@ -4,9 +4,15 @@ import cn.daoge.imagenk.imagemap.ImageMap;
 import cn.daoge.imagenk.imagemapstorage.ImageMapStorage;
 import cn.daoge.imagenk.imageprovider.ImageProvider;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockEntityHolder;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockItemFrame;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityItemFrame;
+import cn.nukkit.item.ItemMap;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import lombok.Getter;
 import org.w3c.dom.css.RGBColor;
@@ -43,14 +49,11 @@ public class SimpleImageMapManager implements ImageMapManager{
         var pos1 = imageMap.getPos1();
         var pos2 = imageMap.getPos2();
 
-        var image = this.provider.get(imageMap.getImageName());
+        var fullImage = this.provider.get(imageMap.getImageName());
         var id = imageMap.getId();
 
         //未找到图片
-        if (image == null) return false;
-
-        //分割图片
-        var images = splitImage(image, 1, 1, imageMap.getMode());
+        if (fullImage == null) return false;
 
         var minX = Math.min(pos1.x, pos2.x);
         var minY = Math.min(pos1.y, pos2.y);
@@ -62,7 +65,37 @@ public class SimpleImageMapManager implements ImageMapManager{
 
         if (minX == maxX) {
             //在x维面延伸
+            //分割图片
+            var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
+            switch (face) {
+                case WEST -> {
+                    //左上点为yMax & zMin
+                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                        for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            var subImage = images[tmpZ][tmpY];
+                            var pos = new Position(minX, maxY - tmpY, tmpZ + minZ, level);
+                            level.setBlock(pos, Block.get(BlockID.AIR));
 
+                            //获得地图
+                            var itemMap = new ItemMap();
+                            itemMap.setImage(subImage);
+
+                            var frame = new BlockItemFrame();
+                            frame.position(pos);
+                            frame.setBlockFace(face);
+                            frame.setStoringMap(true);
+                            //设置显示地图
+                            var blockEntity = BlockEntityHolder.setBlockAndCreateEntity(frame);
+                            blockEntity.setItem(itemMap);
+                            //更新方块实体以将数据发送到客户端
+                            blockEntity.onUpdate();
+                        }
+                    }
+                }
+                case EAST -> {
+
+                }
+            }
         } else if (minY ==  maxY) {
             //todo: 在y维面延伸
             return false;
@@ -137,9 +170,9 @@ public class SimpleImageMapManager implements ImageMapManager{
             case CENTER -> {
                 //居中模式
                 //计算背景色（通过混合所有像素的RGB）
-                int r = 0;
-                int g = 0;
-                int b = 0;
+                long r = 0;
+                long g = 0;
+                long b = 0;
                 for (int imageX = 0; imageX < image.getWidth(); imageX++) {
                     for (int imageY = 0; imageY < image.getHeight(); imageY++) {
                         var color = new Color(image.getRGB(imageX, imageY));
@@ -149,9 +182,9 @@ public class SimpleImageMapManager implements ImageMapManager{
                     }
                 }
                 //总的像素数量
-                var pixelCount = ((image.getWidth() + 1) * (image.getHeight() + 1));
+                var pixelCount = ((long) (image.getWidth() + 1) * (long) (image.getHeight() + 1));
                 //计算出平均RGB
-                var backgroundColor = new Color(r / pixelCount, g / pixelCount, b / pixelCount);
+                var backgroundColor = new Color((int) (r / pixelCount), (int) (g / pixelCount), (int) (b / pixelCount));
 
                 //新的正方形图片
                 var fullImage = new BufferedImage(width * 128, height * 128, image.getType());

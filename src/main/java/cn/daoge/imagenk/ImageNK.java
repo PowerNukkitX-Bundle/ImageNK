@@ -57,6 +57,7 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
+        event.getPlayer().sendMessage(event.getFace().name());
         var item = event.getItem();
         //检查是否是右键+手持有效图片物品
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
@@ -90,6 +91,7 @@ public class ImageNK extends PluginBase implements Listener {
             setIdAndModeForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(SimpleImageMapManager.SplitMode.values()).map(Enum::name).toList()));
             setIdAndModeForm.addHandler((creator, i) -> {
                 var response = setIdAndModeForm.getResponse();
+                if (response == null) return;
                 //获取图片id和显示模式
                 var id = response.getInputResponse(0);
                 var mode = SimpleImageMapManager.SplitMode.valueOf(response.getDropdownResponse(1).getElementContent());

@@ -29,6 +29,7 @@ public class ImageNKCommand extends Command {
         mainForm.addButton(new ElementButton("Create Image", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/gui/newgui/anvil-hammer.png")));
         mainForm.addHandler((player, i) -> {
             var mainFormResponse = mainForm.getResponse();
+            if (mainFormResponse == null) return;
             switch (mainFormResponse.getClickedButtonId()) {
                 case 0 -> {
                     //create image
@@ -38,6 +39,7 @@ public class ImageNKCommand extends Command {
                     );
                     createImageForm.addHandler((creator, i1) -> {
                         var createImageFormResponse = createImageForm.getResponse();
+                        if (createImageFormResponse == null) return;
                         ImageNK.getInstance().giveImageMapItem(creator, createImageFormResponse.getClickedButton().getText());
                         creator.sendMessage("[ImageNK] §aimage map item gave");
                     });
