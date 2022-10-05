@@ -1,10 +1,11 @@
-package cn.daoge.imagenk.storage;
+package cn.daoge.imagenk.imageprovider;
 
 import cn.daoge.imagenk.ImageNK;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +16,10 @@ import java.util.Map;
  * 本地图片存储实现类
  */
 @Getter
-public class LocalImageStorage extends CachedImageStorage {
+public class LocalImageProvider extends CachedImageProvider {
     protected Path rootPath;
 
-    public LocalImageStorage(Path rootPath) {
+    public LocalImageProvider(Path rootPath) {
         this.rootPath = rootPath;
         //检查文件夹可用性
         if (!Files.exists(rootPath)) {
@@ -31,19 +32,19 @@ public class LocalImageStorage extends CachedImageStorage {
     }
 
     @Override
-    public Map<String, Image> loadAll() {
-        var all = new HashMap<String, Image>();
+    public Map<String, BufferedImage> loadAll() {
+        var all = new HashMap<String, BufferedImage>();
         try (var stream = Files.walk(rootPath, 1)) {
             stream.filter(Files::isRegularFile).forEach(path -> {
                 var name = path.getName(path.getNameCount() - 1).toString();
-                Image image;
+                BufferedImage image;
                 try {image = ImageIO.read(path.toFile());} catch (IOException e) {throw new RuntimeException(e);}
                 var logger = ImageNK.getInstance().getLogger();
                 if (image == null) {
                     logger.warning("§cUnable to load image: §f" + name);
                     return;
                 }
-                logger.warning("§aSuccessfully load image: §f" + name);
+                logger.info("§aSuccessfully load image: §f" + name);
                 all.put(name, image);
             });
         } catch (IOException e) {

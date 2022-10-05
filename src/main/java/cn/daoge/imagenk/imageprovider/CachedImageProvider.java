@@ -1,7 +1,8 @@
-package cn.daoge.imagenk.storage;
+package cn.daoge.imagenk.imageprovider;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -9,11 +10,11 @@ import java.util.Set;
 /**
  * 会缓存图片进内存的存储抽象类
  */
-public abstract class CachedImageStorage implements ImageStorage{
-    protected Map<String, Image> cache = new HashMap<>();
+public abstract class CachedImageProvider implements ImageProvider {
+    protected Map<String, BufferedImage> cache = new HashMap<>();
 
     @Override
-    public @Nullable Image get(String name) {
+    public @Nullable BufferedImage get(String name) {
         return cache.get(name);
     }
 
@@ -42,5 +43,5 @@ public abstract class CachedImageStorage implements ImageStorage{
     /**
      * 加载所有图片
      */
-    protected abstract Map<String, Image> loadAll();
+    protected abstract Map<String, BufferedImage> loadAll();
 }
