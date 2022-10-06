@@ -35,6 +35,22 @@ public class SimpleImageMapManager implements ImageMapManager {
     }
 
     @Override
+    public ImageMap getImageMap(String id) {
+        return imageMaps.get(id);
+    }
+
+    @Override
+    public ImageMap getImageMapInPosition(Position pos) {
+        for(var imageMap : imageMaps.values()) {
+            if (!pos.level.getName().equals(imageMap.getLevel().getName())) continue;
+            var box = new SimpleAxisAlignedBB(imageMap.getPos1(), imageMap.getPos2());
+            if (box.isVectorInside(pos)) return imageMap;
+        }
+        //未找到
+        return null;
+    }
+
+    @Override
     public Map<String, ImageMap> getAllImageMap() {
         return this.imageMaps;
     }

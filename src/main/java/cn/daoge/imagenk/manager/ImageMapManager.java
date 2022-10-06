@@ -6,6 +6,7 @@ import cn.daoge.imagenk.imageprovider.ImageProvider;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +16,8 @@ import java.util.Set;
 public interface ImageMapManager {
     ImageMapStorage getStorage();
     ImageProvider getProvider();
+    @Nullable ImageMap getImageMap(String id);
+    @Nullable ImageMap getImageMapInPosition(Position pos);
     Map<String, ImageMap> getAllImageMap();
 
     /**

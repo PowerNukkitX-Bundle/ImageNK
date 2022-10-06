@@ -16,15 +16,20 @@ import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.form.element.ElementButton;
+import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementInput;
+import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowCustom;
+import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.TextFormat;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -64,9 +69,43 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
+        var currentTick = Server.getInstance().getTick();
+        var player = event.getPlayer();
+
+        //向玩家发送此地图画有关的信息
         //检查点击位置是否已存在地图画
-        event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
-        if (event.isCancelled()) return;
+        if (this.shouldBlockEventCancelled(event.getBlock())) {
+            event.setCancelled();
+            if (!player.isOp() && !player.isCreative()) return;
+            if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN)
+                return;
+            interactCoolDown.put(player, currentTick);
+
+            var imageMap = imageMapManager.getImageMapInPosition(event.getBlock());
+            var information = new StringBuilder();
+
+            information
+                    .append("§fImageName: §a" + imageMap.getImageName() + "\n")
+                    .append("§fImageId: §a" + imageMap.getId() + "\n")
+                    .append("§fSplitMode: §a" + imageMap.getMode() + "\n")
+                    .append("§fLevelName: §a" + imageMap.getLevelName() + "\n")
+                    .append("§fPos1: §a" + imageMap.getPos1() + "\n")
+                    .append("§fPos2: §a" + imageMap.getPos2());
+
+            var imageMapInfoForm = new FormWindowSimple("ImageNK", information.toString());
+            imageMapInfoForm.addButton(new ElementButton("Remove This Image", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/ui/crossout.png")));
+            imageMapInfoForm.addHandler((player1, i) -> {
+                var imageMapInfoFormResponse = imageMapInfoForm.getResponse();
+                if (imageMapInfoFormResponse != null) {
+                    //由于只有一个按钮，所以说他肯定点击了删除按钮
+                    if (imageMapManager.removeImageMap(imageMap.getId()))
+                        player1.sendMessage("[ImageNK] §aImage removed");
+                }
+            });
+            player.showFormWindow(imageMapInfoForm);
+
+            return;
+        }
 
         var item = event.getItem();
         //检查是否是右键+手持有效图片物品
@@ -75,9 +114,8 @@ public class ImageNK extends PluginBase implements Listener {
                 item.getId() != IMAGE_ITEM_ID ||
                 !item.getNamedTag().contains(KEY_IMAGE_NAME)) return;
 
+        //撤销事件
         event.setCancelled();
-        var player = event.getPlayer();
-        var currentTick = Server.getInstance().getTick();
         if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN)
             return;
         interactCoolDown.put(player, currentTick);
