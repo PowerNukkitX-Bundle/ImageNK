@@ -7,21 +7,17 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockEntityHolder;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockItemFrame;
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.item.ItemMap;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import lombok.Getter;
-import org.w3c.dom.css.RGBColor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-public class SimpleImageMapManager implements ImageMapManager{
+public class SimpleImageMapManager implements ImageMapManager {
 
     @Getter
     protected ImageMapStorage storage;
@@ -73,35 +69,74 @@ public class SimpleImageMapManager implements ImageMapManager{
                     for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
                         for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
                             var subImage = images[tmpZ][tmpY];
-                            var pos = new Position(minX, maxY - tmpY, tmpZ + minZ, level);
-                            level.setBlock(pos, Block.get(BlockID.AIR));
-
-                            //获得地图
-                            var itemMap = new ItemMap();
-                            itemMap.setImage(subImage);
-
-                            var frame = new BlockItemFrame();
-                            frame.position(pos);
-                            frame.setBlockFace(face);
-                            frame.setStoringMap(true);
-                            //设置显示地图
-                            var blockEntity = BlockEntityHolder.setBlockAndCreateEntity(frame);
-                            blockEntity.setItem(itemMap);
-                            //更新方块实体以将数据发送到客户端
-                            blockEntity.onUpdate();
+                            var pos = new Position(minX - 1, maxY - tmpY, tmpZ + minZ, level);
+                            placeImageMap(pos, subImage, face);
                         }
                     }
                 }
                 case EAST -> {
-
+                    //左上点为yMax & zMax
+                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                        for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            var subImage = images[tmpZ][tmpY];
+                            var pos = new Position(minX + 1, maxY - tmpY, maxZ - tmpZ, level);
+                            placeImageMap(pos, subImage, face);
+                        }
+                    }
                 }
             }
-        } else if (minY ==  maxY) {
-            //todo: 在y维面延伸
-            return false;
+        } else if (minY == maxY) {
+            //在y维面延伸
+            //分割图片
+            var images = splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
+            switch (face) {
+                case DOWN -> {
+                    //左上点为xMin & zMax
+                    for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                        for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            var subImage = images[tmpX][tmpZ];
+                            var pos = new Position(tmpX + minX, minY - 1, maxZ - tmpZ, level);
+                            placeImageMap(pos, subImage, face);
+                        }
+                    }
+                }
+                case UP -> {
+                    //左上点为xMin & zMin
+                    for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                        for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            var subImage = images[tmpX][tmpZ];
+                            var pos = new Position(tmpX + minX, minY + 1, tmpZ + minZ, level);
+                            placeImageMap(pos, subImage, face);
+                        }
+                    }
+                }
+            }
         } else if (minZ == maxZ) {
             //在z维面延伸
-
+            //分割图片
+            var images = splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.y - pos2.y) + 1, imageMap.getMode());
+            switch (face) {
+                case SOUTH -> {
+                    //左上点为xMin & yMax
+                    for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                        for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                            var subImage = images[tmpX][tmpY];
+                            var pos = new Position(tmpX + minX, maxY - tmpY, minZ + 1, level);
+                            placeImageMap(pos, subImage, face);
+                        }
+                    }
+                }
+                case NORTH -> {
+                    //左上点为xMax & yMax
+                    for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                        for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                            var subImage = images[tmpX][tmpY];
+                            var pos = new Position(maxX - tmpX, maxY - tmpY, minZ - 1, level);
+                            placeImageMap(pos, subImage, face);
+                        }
+                    }
+                }
+            }
         } else {
             //两点无效
             return false;
@@ -109,6 +144,25 @@ public class SimpleImageMapManager implements ImageMapManager{
 
         this.storage.save(imageMap);
         return true;
+    }
+
+    public void placeImageMap(Position pos, BufferedImage subImage, BlockFace face) {
+        var level = pos.getLevel();
+        level.setBlock(pos, Block.get(BlockID.AIR));
+
+        //获得地图
+        var itemMap = new ItemMap();
+        itemMap.setImage(subImage);
+
+        var frame = new BlockItemFrame();
+        frame.position(pos);
+        frame.setBlockFace(face);
+        frame.setStoringMap(true);
+        //设置显示地图
+        var blockEntity = BlockEntityHolder.setBlockAndCreateEntity(frame);
+        blockEntity.setItem(itemMap);
+        //更新方块实体以将数据发送到客户端
+        blockEntity.onUpdate();
     }
 
     @Override
@@ -138,10 +192,11 @@ public class SimpleImageMapManager implements ImageMapManager{
 
     /**
      * 分割源图片使得其可被放入地图(128*128)中
-     * @param image 源图片
+     *
+     * @param image  源图片
      * @param height 预先准备的垂直地图数量
-     * @param width 预先准备的水平地图数量
-     * @param mode 分割模式
+     * @param width  预先准备的水平地图数量
+     * @param mode   分割模式
      * @return BufferedImage[x][y] （左上角开始）
      */
     protected BufferedImage[][] splitImage(BufferedImage image, int height, int width, SplitMode mode) {
@@ -194,10 +249,10 @@ public class SimpleImageMapManager implements ImageMapManager{
                     double k;
                     if (image.getHeight() - fullImage.getHeight() > image.getWidth() - fullImage.getWidth()) {
                         //优先满足高度缩放
-                        k = (double)fullImage.getHeight() / (double)image.getHeight();
+                        k = (double) fullImage.getHeight() / (double) image.getHeight();
                     } else {
                         //优先满足宽度缩放
-                        k = (double)fullImage.getWidth() / (double)image.getWidth();
+                        k = (double) fullImage.getWidth() / (double) image.getWidth();
                     }
 
                     var newImage = new BufferedImage((int) (k * image.getWidth()), (int) (k * image.getHeight()), image.getType());
@@ -219,8 +274,8 @@ public class SimpleImageMapManager implements ImageMapManager{
 
                 //将源图片复制到中间
                 gr1.drawImage(image,
-                            offsetX, offsetY, offsetX + image.getWidth(), offsetY + image.getHeight(),
-                            0, 0, image.getWidth(), image.getHeight(), null);
+                        offsetX, offsetY, offsetX + image.getWidth(), offsetY + image.getHeight(),
+                        0, 0, image.getWidth(), image.getHeight(), null);
                 gr1.dispose();
 
                 BufferedImage[][] imgs = new BufferedImage[width][height];

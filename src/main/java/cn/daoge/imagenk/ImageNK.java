@@ -37,7 +37,9 @@ public class ImageNK extends PluginBase implements Listener {
     protected Map<Player, Integer> interactCoolDown = new HashMap<>();
     protected Map<Player, Position> pos1 = new HashMap<>();
 
-    {instance = this;}
+    {
+        instance = this;
+    }
 
     @Getter
     protected ImageMapManager imageMapManager;
@@ -65,7 +67,6 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
-        event.getPlayer().sendMessage(event.getFace().name());
         var item = event.getItem();
         //检查是否是右键+手持有效图片物品
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||

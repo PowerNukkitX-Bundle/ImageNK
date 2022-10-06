@@ -39,17 +39,17 @@ public class ImageMapAdapter extends TypeAdapter<ImageMap> {
         }
         String levelName = jsonReader.nextString();
         String pos1 = jsonReader.nextString();
-        Integer[] pos1s = (Integer[]) Arrays.stream(pos1.split(",")).map(Integer::parseInt).toArray();
+        var pos1s = Arrays.stream(pos1.split(",")).map(Double::parseDouble).toArray();
         String pos2 = jsonReader.nextString();
-        Integer[] pos2s = (Integer[]) Arrays.stream(pos2.split(",")).map(Integer::parseInt).toArray();
+        var pos2s = Arrays.stream(pos2.split(",")).map(Double::parseDouble).toArray();
         String imageName = jsonReader.nextString();
         String id = jsonReader.nextString();
         String mode = jsonReader.nextString();
         return ImageMap
                 .builder()
                 .levelName(levelName)
-                .pos1(new Vector3(pos1s[0], pos1s[1], pos1s[2]))
-                .pos2(new Vector3(pos2s[0], pos2s[1], pos2s[2]))
+                .pos1(new Vector3((double) pos1s[0], (double) pos1s[1], (double) pos1s[2]))
+                .pos2(new Vector3((double) pos2s[0], (double) pos2s[1], (double) pos2s[2]))
                 .imageName(imageName)
                 .id(id)
                 .mode(SimpleImageMapManager.SplitMode.valueOf(mode))
