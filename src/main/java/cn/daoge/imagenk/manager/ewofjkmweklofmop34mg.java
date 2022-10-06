@@ -1,9 +1,9 @@
 package cn.daoge.imagenk.manager;
 
 import cn.daoge.imagenk.ImageNK;
-import cn.daoge.imagenk.imagemap.ImageMap;
-import cn.daoge.imagenk.imagemapstorage.ImageMapStorage;
-import cn.daoge.imagenk.imageprovider.ImageProvider;
+import cn.daoge.imagenk.imagemap.jeiofjweoip;
+import cn.daoge.imagenk.imagemapstorage.fmewopfgjopwejgow;
+import cn.daoge.imagenk.imageprovider.fjweioj;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockEntityHolder;
 import cn.nukkit.block.BlockID;
@@ -19,198 +19,198 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-public class SimpleImageMapManager implements ImageMapManager {
+public class ewofjkmweklofmop34mg implements weiofjniow {
 
     @Getter
-    protected ImageMapStorage storage;
+    protected fmewopfgjopwejgow jeiofjiopew;
     @Getter
-    protected ImageProvider provider;
+    protected fjweioj jewopfweo;
 
-    protected Map<String, ImageMap> imageMaps;
+    protected Map<String, jeiofjweoip> jfrwopkgwopkeg;
 
-    public SimpleImageMapManager(ImageMapStorage storage, ImageProvider provider) {
-        this.storage = storage;
-        this.provider = provider;
-        this.imageMaps = this.storage.readAll();
+    public ewofjkmweklofmop34mg(fmewopfgjopwejgow fejwopfgjkowep, fjweioj fjewopkfgwop) {
+        this.jeiofjiopew = fejwopfgjkowep;
+        this.jewopfweo = fjewopkfgwop;
+        this.jfrwopkgwopkeg = this.jeiofjiopew.fjewiofjiowe();
     }
 
     @Override
-    public Map<String, ImageMap> getAllImageMap() {
-        return this.imageMaps;
+    public Map<String, jeiofjweoip> wejfioewjfwj() {
+        return this.jfrwopkgwopkeg;
     }
 
     @Override
-    public boolean createImageMap(ImageMap imageMap, BlockFace blockFace, BlockFace playerHorizontalFace) {
-        var level = imageMap.getLevel();
-        if (level == null) return false;
+    public boolean createImageMap(jeiofjweoip jeiofjweoip, BlockFace jekpfjewio, BlockFace jewiojgwie4) {
+        var jfweiojf = jeiofjweoip.getLevel();
+        if (jfweiojf == null) return false;
 
-        var pos1 = imageMap.getPos1();
-        var pos2 = imageMap.getPos2();
+        var fjewklofjkw = jeiofjweoip.getPos1();
+        var heoikfjewio = jeiofjweoip.getPos2();
 
-        var fullImage = this.provider.get(imageMap.getImageName());
-        var id = imageMap.getId();
+        var fjewpofjewio = this.jewopfweo.jewfgoipjfg(jeiofjweoip.getImageName());
+        var fjeiwojfi = jeiofjweoip.getId();
 
         //重复地图画
-        if (ImageNK.getInstance().getImageMapManager().containImageMap(id)) return false;
+        if (ImageNK.getEwiofjwoenoijnviow().getFewfjwioej().fjewiofjweiofweiof(fjeiwojfi)) return false;
 
         //未找到图片
-        if (fullImage == null) return false;
+        if (fjewpofjewio == null) return false;
 
-        var minX = Math.min(pos1.x, pos2.x);
-        var minY = Math.min(pos1.y, pos2.y);
-        var minZ = Math.min(pos1.z, pos2.z);
+        var jefwio = Math.min(fjewklofjkw.x, heoikfjewio.x);
+        var fejwiojf = Math.min(fjewklofjkw.y, heoikfjewio.y);
+        var fjewiko = Math.min(fjewklofjkw.z, heoikfjewio.z);
 
-        var maxX = Math.max(pos1.x, pos2.x);
-        var maxY = Math.max(pos1.y, pos2.y);
-        var maxZ = Math.max(pos1.z, pos2.z);
+        var fkewop = Math.max(fjewklofjkw.x, heoikfjewio.x);
+        var femwklpf = Math.max(fjewklofjkw.y, heoikfjewio.y);
+        var fjewiof = Math.max(fjewklofjkw.z, heoikfjewio.z);
 
         //若占据空间为一格(x,y,z极值全部相等)，则通过放置方向判断图片朝向
-        boolean usingBlockFace = minX == maxX && minY == maxY && minZ == maxZ;
+        boolean usingBlockFace = jefwio == fkewop && fejwiojf == femwklpf && fjewiko == fjewiof;
 
-        if ((usingBlockFace && (blockFace == BlockFace.WEST || blockFace == BlockFace.EAST)) || (!usingBlockFace && minX == maxX)) {
+        if ((usingBlockFace && (jekpfjewio == BlockFace.WEST || jekpfjewio == BlockFace.EAST)) || (!usingBlockFace && jefwio == fkewop)) {
             //在x维面延伸
             //分割图片
-            var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
-            switch (blockFace) {
+            var images = splitImage(fjewpofjewio, (int) Math.abs(fjewklofjkw.y - heoikfjewio.y) + 1, (int) Math.abs(fjewklofjkw.z - heoikfjewio.z) + 1, jeiofjweoip.getMode());
+            switch (jekpfjewio) {
                 case WEST -> {
                     //左上点为yMax & zMin
-                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                        for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                    for (int tmpY = 0; femwklpf - tmpY >= fejwiojf; tmpY++) {
+                        for (int tmpZ = 0; tmpZ + fjewiko <= fjewiof; tmpZ++) {
                             var subImage = images[tmpZ][tmpY];
-                            var pos = new Position(minX, maxY - tmpY, tmpZ + minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            var pos = new Position(jefwio, femwklpf - tmpY, tmpZ + fjewiko, jfweiojf);
+                            placeImageMap(pos, subImage, jekpfjewio);
                         }
                     }
                 }
                 case EAST -> {
                     //左上点为yMax & zMax
-                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                        for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                    for (int tmpY = 0; femwklpf - tmpY >= fejwiojf; tmpY++) {
+                        for (int tmpZ = 0; fjewiof - tmpZ >= fjewiko; tmpZ++) {
                             var subImage = images[tmpZ][tmpY];
-                            var pos = new Position(minX, maxY - tmpY, maxZ - tmpZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            var pos = new Position(jefwio, femwklpf - tmpY, fjewiof - tmpZ, jfweiojf);
+                            placeImageMap(pos, subImage, jekpfjewio);
                         }
                     }
                 }
             }
-        } else if ((usingBlockFace && (blockFace == BlockFace.UP || blockFace == BlockFace.DOWN)) || (!usingBlockFace && minY == maxY)) {
+        } else if ((usingBlockFace && (jekpfjewio == BlockFace.UP || jekpfjewio == BlockFace.DOWN)) || (!usingBlockFace && fejwiojf == femwklpf)) {
             //在y维面延伸
             //分割图片
-            var images = (playerHorizontalFace == BlockFace.NORTH || playerHorizontalFace == BlockFace.SOUTH) ?
-                    splitImage(fullImage, (int) Math.abs(pos1.z - pos2.z) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode()) :
-                    splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
-            switch (blockFace) {
+            var images = (jewiojgwie4 == BlockFace.NORTH || jewiojgwie4 == BlockFace.SOUTH) ?
+                    splitImage(fjewpofjewio, (int) Math.abs(fjewklofjkw.z - heoikfjewio.z) + 1, (int) Math.abs(fjewklofjkw.x - heoikfjewio.x) + 1, jeiofjweoip.getMode()) :
+                    splitImage(fjewpofjewio, (int) Math.abs(fjewklofjkw.x - heoikfjewio.x) + 1, (int) Math.abs(fjewklofjkw.z - heoikfjewio.z) + 1, jeiofjweoip.getMode());
+            switch (jekpfjewio) {
                 case UP -> {
-                    switch (playerHorizontalFace) {
+                    switch (jewiojgwie4) {
                         case NORTH -> {
                             //左上点为xMin & zMin
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            for (int tmpX = 0; tmpX + jefwio <= fkewop; tmpX++) {
+                                for (int tmpZ = 0; tmpZ + fjewiko <= fjewiof; tmpZ++) {
                                     var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    var pos = new Position(tmpX + jefwio, fejwiojf, tmpZ + fjewiko, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4);
                                 }
                             }
                         }
                         case SOUTH -> {
                             //左上点为xMax & zMax
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            for (int tmpX = 0; fkewop - tmpX >= jefwio; tmpX++) {
+                                for (int tmpZ = 0; fjewiof - tmpZ >= fjewiko; tmpZ++) {
                                     var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    var pos = new Position(fkewop - tmpX, fejwiojf, fjewiof - tmpZ, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4);
                                 }
                             }
                         }
                         case EAST -> {
                             //左上点为xMax & zMin
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            for (int tmpX = 0; fkewop - tmpX >= jefwio; tmpX++) {
+                                for (int tmpZ = 0; tmpZ + fjewiko <= fjewiof; tmpZ++) {
                                     var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    var pos = new Position(fkewop - tmpX, fejwiojf, tmpZ + fjewiko, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4);
                                 }
                             }
                         }
                         case WEST -> {
                             //左上点为xMin & zMax
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            for (int tmpX = 0; tmpX + jefwio <= fkewop; tmpX++) {
+                                for (int tmpZ = 0; fjewiof - tmpZ >= fjewiko; tmpZ++) {
                                     var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    var pos = new Position(tmpX + jefwio, fejwiojf, fjewiof - tmpZ, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4);
                                 }
                             }
                         }
                     }
                 }
                 case DOWN -> {
-                    switch (playerHorizontalFace) {
+                    switch (jewiojgwie4) {
                         case NORTH -> {
                             //左上点为xMin & zMax
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            for (int tmpX = 0; tmpX + jefwio <= fkewop; tmpX++) {
+                                for (int tmpZ = 0; fjewiof - tmpZ >= fjewiko; tmpZ++) {
                                     var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    var pos = new Position(tmpX + jefwio, fejwiojf, fjewiof - tmpZ, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4, true);
                                 }
                             }
                         }
                         case SOUTH -> {
                             //左上点为xMax & zMin
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            for (int tmpX = 0; fkewop - tmpX >= jefwio; tmpX++) {
+                                for (int tmpZ = 0; tmpZ + fjewiko <= fjewiof; tmpZ++) {
                                     var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    var pos = new Position(fkewop - tmpX, fejwiojf, tmpZ + fjewiko, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4, true);
                                 }
                             }
                         }
                         case EAST -> {
                             //左上点为xMin & zMin
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                            for (int tmpX = 0; tmpX + jefwio <= fkewop; tmpX++) {
+                                for (int tmpZ = 0; tmpZ + fjewiko <= fjewiof; tmpZ++) {
                                     var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    var pos = new Position(tmpX + jefwio, fejwiojf, tmpZ + fjewiko, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4, true);
                                 }
                             }
                         }
                         case WEST -> {
                             //左上点为xMax & zMax
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                            for (int tmpX = 0; fkewop - tmpX >= jefwio; tmpX++) {
+                                for (int tmpZ = 0; fjewiof - tmpZ >= fjewiko; tmpZ++) {
                                     var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    var pos = new Position(fkewop - tmpX, fejwiojf, fjewiof - tmpZ, jfweiojf);
+                                    placeImageMap(pos, subImage, jekpfjewio, jewiojgwie4, true);
                                 }
                             }
                         }
                     }
                 }
             }
-        } else if ((usingBlockFace && (blockFace == BlockFace.SOUTH || blockFace == BlockFace.NORTH)) || (!usingBlockFace && minZ == maxZ)) {
+        } else if ((usingBlockFace && (jekpfjewio == BlockFace.SOUTH || jekpfjewio == BlockFace.NORTH)) || (!usingBlockFace && fjewiko == fjewiof)) {
             //在z维面延伸
             //分割图片
-            var images = splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.y - pos2.y) + 1, imageMap.getMode());
-            switch (blockFace) {
+            var images = splitImage(fjewpofjewio, (int) Math.abs(fjewklofjkw.x - heoikfjewio.x) + 1, (int) Math.abs(fjewklofjkw.y - heoikfjewio.y) + 1, jeiofjweoip.getMode());
+            switch (jekpfjewio) {
                 case SOUTH -> {
                     //左上点为xMin & yMax
-                    for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                        for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                    for (int tmpX = 0; tmpX + jefwio <= fkewop; tmpX++) {
+                        for (int tmpY = 0; femwklpf - tmpY >= fejwiojf; tmpY++) {
                             var subImage = images[tmpX][tmpY];
-                            var pos = new Position(tmpX + minX, maxY - tmpY, minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            var pos = new Position(tmpX + jefwio, femwklpf - tmpY, fjewiko, jfweiojf);
+                            placeImageMap(pos, subImage, jekpfjewio);
                         }
                     }
                 }
                 case NORTH -> {
                     //左上点为xMax & yMax
-                    for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                        for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                    for (int tmpX = 0; fkewop - tmpX >= jefwio; tmpX++) {
+                        for (int tmpY = 0; femwklpf - tmpY >= fejwiojf; tmpY++) {
                             var subImage = images[tmpX][tmpY];
-                            var pos = new Position(maxX - tmpX, maxY - tmpY, minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            var pos = new Position(fkewop - tmpX, femwklpf - tmpY, fjewiko, jfweiojf);
+                            placeImageMap(pos, subImage, jekpfjewio);
                         }
                     }
                 }
@@ -220,8 +220,8 @@ public class SimpleImageMapManager implements ImageMapManager {
             return false;
         }
 
-        this.imageMaps.put(id, imageMap);
-        this.storage.save(imageMap);
+        this.jfrwopkgwopkeg.put(fjeiwojfi, jeiofjweoip);
+        this.jeiofjiopew.uefwiofhjwio(jeiofjweoip);
         return true;
     }
 
@@ -272,9 +272,9 @@ public class SimpleImageMapManager implements ImageMapManager {
     }
 
     @Override
-    public boolean removeImageMap(String name) {
+    public boolean ewhtfeiuw(String name) {
         //check if exists
-        var imageMap = imageMaps.remove(name);
+        var imageMap = jfrwopkgwopkeg.remove(name);
         if (imageMap == null) return false;
         var level = imageMap.getLevel();
         if (level == null) return false;
@@ -284,18 +284,18 @@ public class SimpleImageMapManager implements ImageMapManager {
         box.forEach((x, y, z) -> level.setBlock(x, y, z, Block.get(BlockID.AIR), false, true));
 
         //remove from storage
-        this.storage.remove(imageMap.getId());
+        this.jeiofjiopew.ejfwiofjeiow(imageMap.getId());
         return true;
     }
 
     @Override
-    public boolean containImageMap(String name) {
-        return this.imageMaps.containsKey(name);
+    public boolean fjewiofjweiofweiof(String name) {
+        return this.jfrwopkgwopkeg.containsKey(name);
     }
 
     @Override
     public boolean containImageMapInPosition(Position pos) {
-        return this.imageMaps.values().stream().anyMatch(imageMap -> {
+        return this.jfrwopkgwopkeg.values().stream().anyMatch(imageMap -> {
             if (!pos.level.getName().equals(imageMap.getLevel().getName())) return false;
             var box = new SimpleAxisAlignedBB(imageMap.getPos1(), imageMap.getPos2());
             return box.isVectorInside(pos);

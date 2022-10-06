@@ -1,10 +1,10 @@
 package cn.daoge.imagenk;
 
-import cn.daoge.imagenk.imagemap.ImageMap;
-import cn.daoge.imagenk.imagemapstorage.LocalImageMapStorage;
-import cn.daoge.imagenk.imageprovider.LocalImageProvider;
-import cn.daoge.imagenk.manager.ImageMapManager;
-import cn.daoge.imagenk.manager.SimpleImageMapManager;
+import cn.daoge.imagenk.imagemap.jeiofjweoip;
+import cn.daoge.imagenk.imagemapstorage.fwjejfnopwe;
+import cn.daoge.imagenk.imageprovider.mfeklwfnioewfn;
+import cn.daoge.imagenk.manager.weiofjniow;
+import cn.daoge.imagenk.manager.ewofjkmweklofmop34mg;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
@@ -33,39 +33,38 @@ import java.util.Map;
 public class ImageNK extends PluginBase implements Listener {
 
     //图片名称键
-    public static final String KEY_IMAGE_NAME = "ImageName";
-    public static final int IMAGE_ITEM_ID = ItemID.PAINTING;
-    protected static final int INTERACT_COOL_DOWN = 5;
+    public static final String jfweiojfi = "ImageName";
+    public static final int jfioeqjfiow = ItemID.PAINTING;
+    protected static final int jefwkljrwe = 5;
     @Getter
-    protected static ImageNK instance = null;
-    protected Map<Player, Integer> interactCoolDown = new HashMap<>();
-    protected Map<Player, Position> pos1 = new HashMap<>();
+    protected static ImageNK ewiofjwoenoijnviow = null;
+    protected Map<Player, Integer> fknweonviovwoinvsklj = new HashMap<>();
+    protected Map<Player, Position> feklwnfdmnfweio = new HashMap<>();
     @Getter
-    protected ImageMapManager imageMapManager;
+    protected weiofjniow fewfjwioej;
 
     {
-        instance = this;
+        ewiofjwoenoijnviow = this;
     }
 
     @Override
     public void onEnable() {
-        var dataPath = this.getDataFolder().toPath();
-        var provider = new LocalImageProvider(dataPath.resolve("images"));
-        //预缓存图片
-        provider.cache();
-        var storage = new LocalImageMapStorage(dataPath.resolve("data.json"));
-        this.imageMapManager = new SimpleImageMapManager(storage, provider);
-        var server = Server.getInstance();
-        server.getPluginManager().registerEvents(this, this);
-        server.getCommandMap().register("", new ImageNKCommand("imagenk"));
+        var ewdj389hnf = this.getDataFolder().toPath();
+        var fnb7u34h839yrh = new mfeklwfnioewfn(ewdj389hnf.resolve("images"));
+        var fneiowfhniow = new fwjejfnopwe(ewdj389hnf.resolve("data.json"));
+        this.fewfjwioej = new ewofjkmweklofmop34mg(fneiowfhniow, fnb7u34h839yrh);
+        var djewopfmopiew = Server.getInstance();
+        djewopfmopiew.getPluginManager().registerEvents(this, this);
+        djewopfmopiew.getCommandMap().register("", new FJOPERjkfpowejfg("imagenk"));
+        fnb7u34h839yrh.poertwkfe();
     }
 
     @Override
     public void onDisable() {
         var dataPath = this.getDataFolder().toPath();
-        var provider = new LocalImageProvider(dataPath.resolve("images"));
+        var provider = new mfeklwfnioewfn(dataPath.resolve("images"));
         //关闭时清理缓存，适配热加载。
-        provider.clearCache();
+        provider.fgmwelpkgopwkgpogopwkgopwgkowpr();
     }
 
     @EventHandler
@@ -78,24 +77,24 @@ public class ImageNK extends PluginBase implements Listener {
         //检查是否是右键+手持有效图片物品
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
                 item == null ||
-                item.getId() != IMAGE_ITEM_ID ||
-                !item.getNamedTag().contains(KEY_IMAGE_NAME)) return;
+                item.getId() != jfioeqjfiow ||
+                !item.getNamedTag().contains(jfweiojfi)) return;
 
         event.setCancelled();
         var player = event.getPlayer();
         var currentTick = Server.getInstance().getTick();
-        if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN)
+        if (fknweonviovwoinvsklj.get(player) != null && currentTick - fknweonviovwoinvsklj.get(player) <= jefwkljrwe)
             return;
-        interactCoolDown.put(player, currentTick);
+        fknweonviovwoinvsklj.put(player, currentTick);
 
         var interactVec = event.getBlock().getSide(event.getFace()).clone();
-        if (!pos1.containsKey(player)) {
+        if (!feklwnfdmnfweio.containsKey(player)) {
             //第一个点
-            pos1.put(player, interactVec);
+            feklwnfdmnfweio.put(player, interactVec);
             player.sendMessage("[ImageNK] §aPos1 set at: §f" + interactVec.asBlockVector3() + "§a, please set pos2");
         } else {
             //开始生成图片
-            var clickedPos1 = pos1.remove(player);
+            var clickedPos1 = feklwnfdmnfweio.remove(player);
             //检查是否在一个世界
             if (!clickedPos1.getLevelName().equals(interactVec.getLevelName())) {
                 player.sendMessage("[ImageNK] §cTwo pos must be in the same level");
@@ -105,29 +104,29 @@ public class ImageNK extends PluginBase implements Listener {
 
             var setIdAndModeForm = new FormWindowCustom("ImageNK");
             setIdAndModeForm.addElement(new ElementInput("Image identifier: "));
-            setIdAndModeForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(SimpleImageMapManager.SplitMode.values()).map(Enum::name).toList()));
+            setIdAndModeForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(ewofjkmweklofmop34mg.SplitMode.values()).map(Enum::name).toList()));
             setIdAndModeForm.addHandler((creator, i) -> {
                 var response = setIdAndModeForm.getResponse();
                 if (response == null) return;
                 //获取图片id和显示模式
                 var id = response.getInputResponse(0);
-                if (ImageNK.getInstance().getImageMapManager().containImageMap(id)) {
+                if (ImageNK.getEwiofjwoenoijnviow().getFewfjwioej().fjewiofjweiofweiof(id)) {
                     creator.sendMessage("[ImageNK] §cDuplicate image id");
                     return;
                 }
-                var mode = SimpleImageMapManager.SplitMode.valueOf(response.getDropdownResponse(1).getElementContent());
+                var mode = ewofjkmweklofmop34mg.SplitMode.valueOf(response.getDropdownResponse(1).getElementContent());
                 //开始生成图片信息
-                var imageMap = ImageMap
+                var imageMap = jeiofjweoip
                         .builder()
                         .pos1(clickedPos1)
                         .pos2(interactVec)
                         .levelName(clickedPos1.getLevelName())
-                        .imageName(item.getNamedTag().getString(KEY_IMAGE_NAME))
+                        .imageName(item.getNamedTag().getString(jfweiojfi))
                         .id(id)
                         .mode(mode)
                         .build();
                 //通知管理器生成图片
-                if (this.imageMapManager.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing()))
+                if (this.fewfjwioej.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing()))
                     player.sendMessage("[ImageNK] §aSucceed!");
                 else player.sendMessage("[ImageNK] §cFailed!");
             });
@@ -138,14 +137,14 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        interactCoolDown.remove(event.getPlayer());
+        fknweonviovwoinvsklj.remove(event.getPlayer());
     }
 
     public void giveImageMapItem(Player player, String imageName) {
-        var item = Item.get(IMAGE_ITEM_ID);
+        var item = Item.get(jfioeqjfiow);
         item.setCustomName(imageName);
         item.setLore("ImageName: " + imageName);
-        item.setNamedTag(item.getNamedTag().put(KEY_IMAGE_NAME, new StringTag(KEY_IMAGE_NAME, imageName)));
+        item.setNamedTag(item.getNamedTag().put(jfweiojfi, new StringTag(jfweiojfi, imageName)));
         player.giveItem(item);
     }
 
@@ -165,6 +164,6 @@ public class ImageNK extends PluginBase implements Listener {
     }
 
     protected boolean shouldBlockEventCancelled(Block block) {
-        return block instanceof BlockItemFrame && imageMapManager.containImageMapInPosition(block);
+        return block instanceof BlockItemFrame && fewfjwioej.containImageMapInPosition(block);
     }
 }

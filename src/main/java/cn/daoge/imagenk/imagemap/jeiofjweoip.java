@@ -1,6 +1,6 @@
 package cn.daoge.imagenk.imagemap;
 
-import cn.daoge.imagenk.manager.SimpleImageMapManager;
+import cn.daoge.imagenk.manager.ewofjkmweklofmop34mg;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class ImageMap {
+public class jeiofjweoip {
     protected String levelName;
     protected Vector3 pos1;
     protected Vector3 pos2;
@@ -21,7 +21,7 @@ public class ImageMap {
     //标识名
     protected String id;
     //图片显示模式
-    protected SimpleImageMapManager.SplitMode mode;
+    protected ewofjkmweklofmop34mg.SplitMode mode;
 
     public Level getLevel() {
         var server = Server.getInstance();
