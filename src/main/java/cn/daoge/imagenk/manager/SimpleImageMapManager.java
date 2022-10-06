@@ -41,7 +41,7 @@ public class SimpleImageMapManager implements ImageMapManager {
 
     @Override
     public ImageMap getImageMapInPosition(Position pos) {
-        for(var imageMap : imageMaps.values()) {
+        for (var imageMap : imageMaps.values()) {
             if (!pos.level.getName().equals(imageMap.getLevel().getName())) continue;
             var box = new SimpleAxisAlignedBB(imageMap.getPos1(), imageMap.getPos2());
             if (box.isVectorInside(pos)) return imageMap;
@@ -268,6 +268,7 @@ public class SimpleImageMapManager implements ImageMapManager {
 
     /**
      * 通过水平朝向计算展示框中物品的旋转值
+     *
      * @param face 水平朝向
      * @param down 展示框朝向是否是向下的
      * @return 朝向的int值
@@ -281,7 +282,8 @@ public class SimpleImageMapManager implements ImageMapManager {
             //错误的形参
             default -> -1;
         };
-        if (value == -1) throw new IllegalArgumentException("Illegal block face given to getMapFrameRotationByFace(BlockFace face)");
+        if (value == -1)
+            throw new IllegalArgumentException("Illegal block face given to getMapFrameRotationByFace(BlockFace face)");
         return value;
     }
 

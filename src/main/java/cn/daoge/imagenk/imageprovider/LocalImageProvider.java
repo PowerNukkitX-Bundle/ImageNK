@@ -37,7 +37,11 @@ public class LocalImageProvider extends CachedImageProvider {
             stream.filter(Files::isRegularFile).forEach(path -> {
                 var name = path.getName(path.getNameCount() - 1).toString();
                 BufferedImage image;
-                try {image = ImageIO.read(path.toFile());} catch (IOException e) {throw new RuntimeException(e);}
+                try {
+                    image = ImageIO.read(path.toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 var logger = ImageNK.getInstance().getLogger();
                 if (image == null) {
                     logger.warning("§cUnable to load image: §f" + name);

@@ -10,9 +10,14 @@ import java.util.Set;
  */
 public interface ImageMapStorage {
     ImageMap read(String name);
+
     Map<String, ImageMap> readAll();
+
     void save(ImageMap imageMap);
+
     void saveAll(Set<ImageMap> imageMaps);
+
     void remove(String name);
+
     void saveToFile();
 }
