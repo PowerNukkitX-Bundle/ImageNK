@@ -16,6 +16,7 @@ import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
@@ -67,6 +68,8 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
+        //debug
+        event.getPlayer().sendMessage(event.getPlayer().getHorizontalFacing().toString());
         var item = event.getItem();
         //检查是否是右键+手持有效图片物品
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
@@ -80,7 +83,7 @@ public class ImageNK extends PluginBase implements Listener {
         if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN) return;
         interactCoolDown.put(player, currentTick);
 
-        var interactVec = event.getBlock();
+        var interactVec = event.getBlock().getSide(event.getFace()).clone();
         if (!pos1.containsKey(player)) {
             //第一个点
             pos1.put(player, interactVec);
@@ -103,6 +106,10 @@ public class ImageNK extends PluginBase implements Listener {
                 if (response == null) return;
                 //获取图片id和显示模式
                 var id = response.getInputResponse(0);
+                if (ImageNK.getInstance().getImageMapManager().containImageMap(id)) {
+                    creator.sendMessage("[ImageNK] §cDuplicate image id");
+                    return;
+                }
                 var mode = SimpleImageMapManager.SplitMode.valueOf(response.getDropdownResponse(1).getElementContent());
                 //开始生成图片信息
                 var imageMap = ImageMap
@@ -115,7 +122,7 @@ public class ImageNK extends PluginBase implements Listener {
                         .mode(mode)
                         .build();
                 //通知管理器生成图片
-                if (this.imageMapManager.createImageMap(imageMap, event.getFace())) player.sendMessage("[ImageNK] §aSucceed!");
+                if (this.imageMapManager.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing())) player.sendMessage("[ImageNK] §aSucceed!");
                 else player.sendMessage("[ImageNK] §cFailed!");
             });
 

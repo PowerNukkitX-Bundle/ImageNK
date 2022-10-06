@@ -7,6 +7,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 图片操作管理器接口
@@ -15,8 +16,20 @@ public interface ImageMapManager {
     ImageMapStorage getStorage();
     ImageProvider getProvider();
     Map<String, ImageMap> getAllImageMap();
-    boolean createImageMap(ImageMap imageMap, BlockFace face);
+
+    /**
+     * 生成一张地图画
+     * @param imageMap 地图1画相关信息
+     * @param face 地图画朝向
+     * @param playerHorizontalFace 创建者水平朝向（当地图画朝向为UP或DOWN时此参有用）
+     * @return 成功创建
+     */
+    boolean createImageMap(ImageMap imageMap, BlockFace face, BlockFace playerHorizontalFace);
     boolean removeImageMap(String name);
     boolean containImageMap(String name);
     boolean containImageMapInPosition(Position pos);
+
+    default Set<String> getAllImageFile() {
+        return getProvider().getAll();
+    }
 }
