@@ -64,160 +64,158 @@ public class SimpleImageMapManager implements ImageMapManager {
         var maxY = Math.max(pos1.y, pos2.y);
         var maxZ = Math.max(pos1.z, pos2.z);
 
-        //若占据空间为一格(x,y,z极值全部相等)，则通过放置方向判断图片朝向
-        boolean usingBlockFace = minX == maxX && minY == maxY && minZ == maxZ;
-
-        if ((usingBlockFace && (blockFace == BlockFace.WEST || blockFace == BlockFace.EAST)) || (!usingBlockFace && minX == maxX)) {
-            //在x维面延伸
-            //分割图片
-            var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
-            switch (blockFace) {
-                case WEST -> {
-                    //左上点为yMax & zMin
-                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                        for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
-                            var subImage = images[tmpZ][tmpY];
-                            var pos = new Position(minX, maxY - tmpY, tmpZ + minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
-                        }
-                    }
-                }
-                case EAST -> {
-                    //左上点为yMax & zMax
-                    for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                        for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
-                            var subImage = images[tmpZ][tmpY];
-                            var pos = new Position(minX, maxY - tmpY, maxZ - tmpZ, level);
-                            placeImageMap(pos, subImage, blockFace);
-                        }
-                    }
-                }
-            }
-        } else if ((usingBlockFace && (blockFace == BlockFace.UP || blockFace == BlockFace.DOWN)) || (!usingBlockFace && minY == maxY)) {
-            //在y维面延伸
-            //分割图片
-            var images = (playerHorizontalFace == BlockFace.NORTH || playerHorizontalFace == BlockFace.SOUTH) ?
-                    splitImage(fullImage, (int) Math.abs(pos1.z - pos2.z) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode()) :
-                    splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
-            switch (blockFace) {
-                case UP -> {
-                    switch (playerHorizontalFace) {
-                        case NORTH -> {
-                            //左上点为xMin & zMin
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
-                                    var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
-                                }
-                            }
-                        }
-                        case SOUTH -> {
-                            //左上点为xMax & zMax
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
-                                    var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
-                                }
-                            }
-                        }
-                        case EAST -> {
-                            //左上点为xMax & zMin
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
-                                    var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
-                                }
-                            }
-                        }
-                        case WEST -> {
-                            //左上点为xMin & zMax
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
-                                    var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
-                                }
-                            }
-                        }
-                    }
-                }
-                case DOWN -> {
-                    switch (playerHorizontalFace) {
-                        case NORTH -> {
-                            //左上点为xMin & zMax
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
-                                    var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
-                                }
-                            }
-                        }
-                        case SOUTH -> {
-                            //左上点为xMax & zMin
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
-                                    var subImage = images[tmpX][tmpZ];
-                                    var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
-                                }
-                            }
-                        }
-                        case EAST -> {
-                            //左上点为xMin & zMin
-                            for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
-                                for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
-                                    var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
-                                }
-                            }
-                        }
-                        case WEST -> {
-                            //左上点为xMax & zMax
-                            for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
-                                for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
-                                    var subImage = images[tmpZ][tmpX];
-                                    var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
-                                    placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else if ((usingBlockFace && (blockFace == BlockFace.SOUTH || blockFace == BlockFace.NORTH)) || (!usingBlockFace && minZ == maxZ)) {
-            //在z维面延伸
-            //分割图片
-            var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode());
-            switch (blockFace) {
-                case SOUTH -> {
-                    //左上点为xMin & yMax
-                    for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+        switch (blockFace) {
+            case WEST, EAST -> {
+                //在x维面延伸
+                //分割图片
+                var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
+                switch (blockFace) {
+                    case WEST -> {
+                        //左上点为yMax & zMin
                         for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                            var subImage = images[tmpX][tmpY];
-                            var pos = new Position(tmpX + minX, maxY - tmpY, minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                                var subImage = images[tmpZ][tmpY];
+                                var pos = new Position(minX, maxY - tmpY, tmpZ + minZ, level);
+                                placeImageMap(pos, subImage, blockFace);
+                            }
                         }
                     }
-                }
-                case NORTH -> {
-                    //左上点为xMax & yMax
-                    for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                    case EAST -> {
+                        //左上点为yMax & zMax
                         for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
-                            var subImage = images[tmpX][tmpY];
-                            var pos = new Position(maxX - tmpX, maxY - tmpY, minZ, level);
-                            placeImageMap(pos, subImage, blockFace);
+                            for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                                var subImage = images[tmpZ][tmpY];
+                                var pos = new Position(minX, maxY - tmpY, maxZ - tmpZ, level);
+                                placeImageMap(pos, subImage, blockFace);
+                            }
                         }
                     }
                 }
             }
-        } else {
-            //两点无效
-            return false;
+            case UP, DOWN -> {
+                //在y维面延伸
+                //分割图片
+                var images = (playerHorizontalFace == BlockFace.NORTH || playerHorizontalFace == BlockFace.SOUTH) ?
+                        splitImage(fullImage, (int) Math.abs(pos1.z - pos2.z) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode()) :
+                        splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.z - pos2.z) + 1, imageMap.getMode());
+                switch (blockFace) {
+                    case UP -> {
+                        switch (playerHorizontalFace) {
+                            case NORTH -> {
+                                //左上点为xMin & zMin
+                                for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                                    for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                                        var subImage = images[tmpX][tmpZ];
+                                        var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    }
+                                }
+                            }
+                            case SOUTH -> {
+                                //左上点为xMax & zMax
+                                for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                                    for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                                        var subImage = images[tmpX][tmpZ];
+                                        var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    }
+                                }
+                            }
+                            case EAST -> {
+                                //左上点为xMax & zMin
+                                for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                                    for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                                        var subImage = images[tmpZ][tmpX];
+                                        var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    }
+                                }
+                            }
+                            case WEST -> {
+                                //左上点为xMin & zMax
+                                for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                                    for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                                        var subImage = images[tmpZ][tmpX];
+                                        var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    case DOWN -> {
+                        switch (playerHorizontalFace) {
+                            case NORTH -> {
+                                //左上点为xMin & zMax
+                                for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                                    for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                                        var subImage = images[tmpX][tmpZ];
+                                        var pos = new Position(tmpX + minX, minY, maxZ - tmpZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    }
+                                }
+                            }
+                            case SOUTH -> {
+                                //左上点为xMax & zMin
+                                for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                                    for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                                        var subImage = images[tmpX][tmpZ];
+                                        var pos = new Position(maxX - tmpX, minY, tmpZ + minZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    }
+                                }
+                            }
+                            case EAST -> {
+                                //左上点为xMin & zMin
+                                for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                                    for (int tmpZ = 0; tmpZ + minZ <= maxZ; tmpZ++) {
+                                        var subImage = images[tmpZ][tmpX];
+                                        var pos = new Position(tmpX + minX, minY, tmpZ + minZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    }
+                                }
+                            }
+                            case WEST -> {
+                                //左上点为xMax & zMax
+                                for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                                    for (int tmpZ = 0; maxZ - tmpZ >= minZ; tmpZ++) {
+                                        var subImage = images[tmpZ][tmpX];
+                                        var pos = new Position(maxX - tmpX, minY, maxZ - tmpZ, level);
+                                        placeImageMap(pos, subImage, blockFace, playerHorizontalFace, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            case SOUTH, NORTH -> {
+                //在z维面延伸
+                //分割图片
+                var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode());
+                switch (blockFace) {
+                    case SOUTH -> {
+                        //左上点为xMin & yMax
+                        for (int tmpX = 0; tmpX + minX <= maxX; tmpX++) {
+                            for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                                var subImage = images[tmpX][tmpY];
+                                var pos = new Position(tmpX + minX, maxY - tmpY, minZ, level);
+                                placeImageMap(pos, subImage, blockFace);
+                            }
+                        }
+                    }
+                    case NORTH -> {
+                        //左上点为xMax & yMax
+                        for (int tmpX = 0; maxX - tmpX >= minX; tmpX++) {
+                            for (int tmpY = 0; maxY - tmpY >= minY; tmpY++) {
+                                var subImage = images[tmpX][tmpY];
+                                var pos = new Position(maxX - tmpX, maxY - tmpY, minZ, level);
+                                placeImageMap(pos, subImage, blockFace);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         this.imageMaps.put(id, imageMap);

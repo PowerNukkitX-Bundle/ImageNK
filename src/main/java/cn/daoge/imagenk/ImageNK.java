@@ -22,6 +22,7 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Position;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
 import lombok.Getter;
@@ -40,6 +41,7 @@ public class ImageNK extends PluginBase implements Listener {
     protected static ImageNK instance = null;
     protected Map<Player, Integer> interactCoolDown = new HashMap<>();
     protected Map<Player, Position> pos1 = new HashMap<>();
+    protected Map<Player, BlockFace> pos1BlockFace = new HashMap<>();
     @Getter
     protected ImageMapManager imageMapManager;
 
@@ -92,13 +94,20 @@ public class ImageNK extends PluginBase implements Listener {
         if (!pos1.containsKey(player)) {
             //第一个点
             pos1.put(player, interactVec);
+            pos1BlockFace.put(player, event.getFace());
             player.sendMessage("[ImageNK] §aPos1 set at: §f" + interactVec.asBlockVector3() + "§a, please set pos2");
         } else {
             //开始生成图片
             var clickedPos1 = pos1.remove(player);
+            var clickedPos1BlockFace = pos1BlockFace.remove(player);
             //检查是否在一个世界
             if (!clickedPos1.getLevelName().equals(interactVec.getLevelName())) {
                 player.sendMessage("[ImageNK] §cTwo pos must be in the same level");
+                return;
+            }
+            //检查是否为有效的两个点
+            if (clickedPos1BlockFace != event.getFace()) {
+                player.sendMessage("[ImageNK] §Illegal positions, the two positions must have the same block face");
                 return;
             }
             player.sendMessage("[ImageNK] §aPos2 set at: §f" + interactVec.asBlockVector3() + "§a, spawning...");
@@ -138,7 +147,11 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        interactCoolDown.remove(event.getPlayer());
+        var player = event.getPlayer();
+        //清除缓存信息
+        interactCoolDown.remove(player);
+        pos1.remove(player);
+        pos1BlockFace.remove(player);
     }
 
     public void giveImageMapItem(Player player, String imageName) {
