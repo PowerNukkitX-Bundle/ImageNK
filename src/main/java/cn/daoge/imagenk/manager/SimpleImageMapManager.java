@@ -192,7 +192,7 @@ public class SimpleImageMapManager implements ImageMapManager {
         } else if ((usingBlockFace && (blockFace == BlockFace.SOUTH || blockFace == BlockFace.NORTH)) || (!usingBlockFace && minZ == maxZ)) {
             //在z维面延伸
             //分割图片
-            var images = splitImage(fullImage, (int) Math.abs(pos1.x - pos2.x) + 1, (int) Math.abs(pos1.y - pos2.y) + 1, imageMap.getMode());
+            var images = splitImage(fullImage, (int) Math.abs(pos1.y - pos2.y) + 1, (int) Math.abs(pos1.x - pos2.x) + 1, imageMap.getMode());
             switch (blockFace) {
                 case SOUTH -> {
                     //左上点为xMin & yMax
