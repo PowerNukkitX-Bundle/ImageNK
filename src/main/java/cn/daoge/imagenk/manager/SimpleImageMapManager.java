@@ -246,11 +246,10 @@ public class SimpleImageMapManager implements ImageMapManager {
         frame.setBlockFace(face);
         frame.setStoringMap(true);
         //设置显示地图
+        //这里我们不更新方块防止展示框掉落
         var blockEntity = BlockEntityHolder.setBlockAndCreateEntity(frame, true, false);
         blockEntity.setItem(itemMap);
         if (rotation != null) blockEntity.setItemRotation(getMapFrameRotationByFace(rotation, down));
-        //更新方块实体以将数据发送到客户端
-//        blockEntity.onUpdate();
     }
 
     /**
