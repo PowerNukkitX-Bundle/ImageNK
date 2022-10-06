@@ -4,6 +4,7 @@ import cn.daoge.imagenk.manager.SimpleImageMapManager;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
+import com.google.gson.annotations.JsonAdapter;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@JsonAdapter(ImageMapAdapter.class)
 public class ImageMap {
     protected String levelName;
     protected Vector3 pos1;
@@ -22,6 +24,8 @@ public class ImageMap {
     protected String id;
     //图片显示模式
     protected SimpleImageMapManager.SplitMode mode;
+    //图片压缩率 0-100
+    protected Double compressibility;
 
     public Level getLevel() {
         var server = Server.getInstance();

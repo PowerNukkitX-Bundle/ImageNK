@@ -16,10 +16,7 @@ import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
-import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.ElementButtonImageData;
-import cn.nukkit.form.element.ElementDropdown;
-import cn.nukkit.form.element.ElementInput;
+import cn.nukkit.form.element.*;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.item.Item;
@@ -143,6 +140,7 @@ public class ImageNK extends PluginBase implements Listener {
             var setIdAndModeForm = new FormWindowCustom("ImageNK");
             setIdAndModeForm.addElement(new ElementInput("Image identifier: "));
             setIdAndModeForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(SimpleImageMapManager.SplitMode.values()).map(Enum::name).toList()));
+            setIdAndModeForm.addElement(new ElementSlider("Compressibility: ", 0, 100, 1, 100));
             setIdAndModeForm.addHandler((creator, i) -> {
                 var response = setIdAndModeForm.getResponse();
                 if (response == null) return;
@@ -153,6 +151,7 @@ public class ImageNK extends PluginBase implements Listener {
                     return;
                 }
                 var mode = SimpleImageMapManager.SplitMode.valueOf(response.getDropdownResponse(1).getElementContent());
+                var compressibility = (double) response.getSliderResponse(2);
                 //开始生成图片信息
                 var imageMap = ImageMap
                         .builder()
@@ -162,6 +161,7 @@ public class ImageNK extends PluginBase implements Listener {
                         .imageName(item.getNamedTag().getString(KEY_IMAGE_NAME))
                         .id(id)
                         .mode(mode)
+                        .compressibility(compressibility)
                         .build();
                 //通知管理器生成图片
                 if (this.imageMapManager.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing()))

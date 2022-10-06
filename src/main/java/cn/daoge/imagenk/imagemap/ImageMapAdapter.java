@@ -8,7 +8,6 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class ImageMapAdapter extends TypeAdapter<ImageMap> {
     @Override
@@ -17,42 +16,53 @@ public class ImageMapAdapter extends TypeAdapter<ImageMap> {
             jsonWriter.nullValue();
             return;
         }
-        String levelName = imageMap.levelName;
-        jsonWriter.value(levelName);
-        String pos1 = imageMap.pos1.x + "," + imageMap.pos1.y + "," + imageMap.pos1.z;
-        jsonWriter.value(pos1);
-        String pos2 = imageMap.pos2.x + "," + imageMap.pos2.y + "," + imageMap.pos2.z;
-        jsonWriter.value(pos2);
-        String imageName = imageMap.imageName;
-        jsonWriter.value(imageName);
-        String id = imageMap.id;
-        jsonWriter.value(id);
-        String mode = imageMap.mode.name();
-        jsonWriter.value(mode);
+        jsonWriter.beginObject()
+                .name("levelName").value(imageMap.levelName)
+                .name("pos1")
+                .beginArray().value(imageMap.pos1.x)
+                .value(imageMap.pos1.y)
+                .value(imageMap.pos1.z)
+                .endArray()
+                .name("pos2")
+                .beginArray().value(imageMap.pos2.x)
+                .value(imageMap.pos2.y)
+                .value(imageMap.pos2.z)
+                .endArray()
+                .name("imageName").value(imageMap.imageName)
+                .name("id").value(imageMap.id)
+                .name("mode").value(imageMap.mode.name())
+                .name("compressibility").value(imageMap.compressibility)
+                .endObject();
     }
 
     @Override
     public ImageMap read(JsonReader jsonReader) throws IOException {
+        var imageMapFactory = ImageMap.builder();
         if (jsonReader.peek() == JsonToken.NULL) {
             jsonReader.nextNull();
             return null;
         }
-        String levelName = jsonReader.nextString();
-        String pos1 = jsonReader.nextString();
-        var pos1s = Arrays.stream(pos1.split(",")).map(Double::parseDouble).toArray();
-        String pos2 = jsonReader.nextString();
-        var pos2s = Arrays.stream(pos2.split(",")).map(Double::parseDouble).toArray();
-        String imageName = jsonReader.nextString();
-        String id = jsonReader.nextString();
-        String mode = jsonReader.nextString();
-        return ImageMap
-                .builder()
-                .levelName(levelName)
-                .pos1(new Vector3((double) pos1s[0], (double) pos1s[1], (double) pos1s[2]))
-                .pos2(new Vector3((double) pos2s[0], (double) pos2s[1], (double) pos2s[2]))
-                .imageName(imageName)
-                .id(id)
-                .mode(SimpleImageMapManager.SplitMode.valueOf(mode))
-                .build();
+        jsonReader.beginObject();
+        while (jsonReader.hasNext()) {
+            switch (jsonReader.nextName()) {
+                case "levelName" -> imageMapFactory.levelName(jsonReader.nextString());
+                case "pos1" -> {
+                    jsonReader.beginArray();
+                    imageMapFactory.pos1(new Vector3(jsonReader.nextDouble(), jsonReader.nextDouble(), jsonReader.nextDouble()));
+                    jsonReader.endArray();
+                }
+                case "pos2" -> {
+                    jsonReader.beginArray();
+                    imageMapFactory.pos2(new Vector3(jsonReader.nextDouble(), jsonReader.nextDouble(), jsonReader.nextDouble()));
+                    jsonReader.endArray();
+                }
+                case "imageName" -> imageMapFactory.imageName(jsonReader.nextString());
+                case "id" -> imageMapFactory.id(jsonReader.nextString());
+                case "mode" -> imageMapFactory.mode(SimpleImageMapManager.SplitMode.valueOf(jsonReader.nextString()));
+                case "compressibility" -> imageMapFactory.compressibility(jsonReader.nextDouble());
+            }
+        }
+        jsonReader.endObject();
+        return imageMapFactory.build();
     }
 }

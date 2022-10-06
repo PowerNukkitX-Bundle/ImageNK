@@ -13,10 +13,15 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import lombok.Getter;
+import net.coobird.thumbnailator.Thumbnails;
 
 import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
 public class SimpleImageMapManager implements ImageMapManager {
@@ -64,6 +69,22 @@ public class SimpleImageMapManager implements ImageMapManager {
         var pos2 = imageMap.getPos2();
 
         var fullImage = this.provider.get(imageMap.getImageName());
+        var imageFactory = Thumbnails.of(fullImage);
+
+        if (imageMap.getCompressibility() != null) {
+            imageFactory.outputQuality(imageMap.getCompressibility() * 0.01);
+        }
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            imageFactory.scale(1).outputFormat("jpg").toOutputStream(outputStream);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            fullImage = ImageIO.read(inputStream);
+        } catch (IOException e) {
+            ImageNK.getInstance().getLogger().error(e.getMessage());
+        }
+
+
         var id = imageMap.getId();
 
         //重复地图画

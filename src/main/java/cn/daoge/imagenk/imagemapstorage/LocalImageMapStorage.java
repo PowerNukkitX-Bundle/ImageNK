@@ -1,10 +1,8 @@
 package cn.daoge.imagenk.imagemapstorage;
 
 import cn.daoge.imagenk.imagemap.ImageMap;
-import cn.daoge.imagenk.imagemap.ImageMapAdapter;
 import cn.nukkit.utils.Config;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -16,7 +14,7 @@ import java.util.Set;
 
 public class LocalImageMapStorage implements ImageMapStorage {
 
-    protected static Gson gson = new GsonBuilder().registerTypeAdapter(ImageMap.class, new ImageMapAdapter()).create();
+    protected static Gson gson = new Gson();
     protected Config dataConfig;
 
     public LocalImageMapStorage(Path path) {
