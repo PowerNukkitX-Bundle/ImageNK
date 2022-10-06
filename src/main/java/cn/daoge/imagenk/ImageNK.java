@@ -55,6 +55,14 @@ public class ImageNK extends PluginBase implements Listener {
         server.getCommandMap().register("", new ImageNKCommand("imagenk"));
     }
 
+    @Override
+    public void onDisable() {
+        var dataPath = this.getDataFolder().toPath();
+        var provider = new LocalImageProvider(dataPath.resolve("images"));
+        //关闭时清理缓存，适配热加载。
+        provider.clearCache();
+    }
+
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
         event.getPlayer().sendMessage(event.getFace().name());
