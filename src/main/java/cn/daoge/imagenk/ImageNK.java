@@ -7,8 +7,13 @@ import cn.daoge.imagenk.manager.ImageMapManager;
 import cn.daoge.imagenk.manager.SimpleImageMapManager;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockItemFrame;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
+import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.block.BlockUpdateEvent;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.form.element.ElementDropdown;
@@ -16,7 +21,6 @@ import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
-import cn.nukkit.level.Location;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
@@ -28,22 +32,20 @@ import java.util.Map;
 
 public class ImageNK extends PluginBase implements Listener {
 
-    @Getter
-    protected static ImageNK instance = null;
-    protected static final int INTERACT_COOL_DOWN = 10;
     //图片名称键
     public static final String KEY_IMAGE_NAME = "ImageName";
     public static final int IMAGE_ITEM_ID = ItemID.PAINTING;
-
+    protected static final int INTERACT_COOL_DOWN = 5;
+    @Getter
+    protected static ImageNK instance = null;
     protected Map<Player, Integer> interactCoolDown = new HashMap<>();
     protected Map<Player, Position> pos1 = new HashMap<>();
+    @Getter
+    protected ImageMapManager imageMapManager;
 
     {
         instance = this;
     }
-
-    @Getter
-    protected ImageMapManager imageMapManager;
 
     @Override
     public void onEnable() {
@@ -68,8 +70,10 @@ public class ImageNK extends PluginBase implements Listener {
 
     @EventHandler
     protected void onPlayerInteract(PlayerInteractEvent event) {
-        //debug
-        event.getPlayer().sendMessage(event.getPlayer().getHorizontalFacing().toString());
+        //检查点击位置是否已存在地图画
+        event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
+        if (event.isCancelled()) return;
+
         var item = event.getItem();
         //检查是否是右键+手持有效图片物品
         if (!event.getAction().equals(PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) ||
@@ -80,7 +84,8 @@ public class ImageNK extends PluginBase implements Listener {
         event.setCancelled();
         var player = event.getPlayer();
         var currentTick = Server.getInstance().getTick();
-        if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN) return;
+        if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN)
+            return;
         interactCoolDown.put(player, currentTick);
 
         var interactVec = event.getBlock().getSide(event.getFace()).clone();
@@ -122,7 +127,8 @@ public class ImageNK extends PluginBase implements Listener {
                         .mode(mode)
                         .build();
                 //通知管理器生成图片
-                if (this.imageMapManager.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing())) player.sendMessage("[ImageNK] §aSucceed!");
+                if (this.imageMapManager.createImageMap(imageMap, event.getFace(), creator.getHorizontalFacing()))
+                    player.sendMessage("[ImageNK] §aSucceed!");
                 else player.sendMessage("[ImageNK] §cFailed!");
             });
 
@@ -141,5 +147,24 @@ public class ImageNK extends PluginBase implements Listener {
         item.setLore("ImageName: " + imageName);
         item.setNamedTag(item.getNamedTag().put(KEY_IMAGE_NAME, new StringTag(KEY_IMAGE_NAME, imageName)));
         player.giveItem(item);
+    }
+
+    @EventHandler
+    public void onBlockUpdate(BlockUpdateEvent event) {
+        event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
+    }
+
+    @EventHandler
+    public void onItemFrameDrop(ItemFrameDropItemEvent event) {
+        event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
+    }
+
+    protected boolean shouldBlockEventCancelled(Block block) {
+        return block instanceof BlockItemFrame && imageMapManager.containImageMapInPosition(block);
     }
 }
