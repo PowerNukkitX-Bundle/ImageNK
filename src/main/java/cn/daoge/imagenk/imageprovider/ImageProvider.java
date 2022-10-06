@@ -20,4 +20,10 @@ public interface ImageProvider {
      * 获取存在的所有图片名称
      */
     Set<String> getAll();
+
+    /**
+     * 要求提供源重新加载文件
+     * 对于非缓存实现，此方法没啥用
+     */
+    void reload();
 }

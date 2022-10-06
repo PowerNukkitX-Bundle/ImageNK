@@ -1,7 +1,6 @@
 package cn.daoge.imagenk.imageprovider;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +23,11 @@ public abstract class CachedImageProvider implements ImageProvider {
     @Override
     public Set<String> getAll() {
         return cache.keySet();
+    }
+
+    @Override
+    public void reload() {
+        cache();
     }
 
     /**

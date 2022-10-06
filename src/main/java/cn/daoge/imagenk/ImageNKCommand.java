@@ -18,15 +18,15 @@ public class ImageNKCommand extends Command {
         }
 
         var mainForm = new FormWindowSimple("ImageNK", "");
-        //todo: image
         mainForm.addButton(new ElementButton("Create Image", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/gui/newgui/anvil-hammer.png")));
         mainForm.addButton(new ElementButton("Remove Image", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/ui/crossout.png")));
+        mainForm.addButton(new ElementButton("Reload Image Source", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/ui/servers.png")));
         mainForm.addHandler((player, i) -> {
             var mainFormResponse = mainForm.getResponse();
             if (mainFormResponse == null) return;
             switch (mainFormResponse.getClickedButtonId()) {
                 case 0 -> {
-                    //create image
+                    //创建图片
                     var createImageForm = new FormWindowSimple("Create Image", "Choose an image");
                     ImageNK.getInstance().getImageMapManager().getProvider().getAll().forEach(
                             name -> createImageForm.addButton(new ElementButton(name, new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/items/painting.png")))
@@ -40,7 +40,7 @@ public class ImageNKCommand extends Command {
                     player.showFormWindow(createImageForm);
                 }
                 case 1 -> {
-                    //remove image
+                    //删除图片
                     var removeImageForm = new FormWindowSimple("Remove Image", "Choose an image");
                     ImageNK.getInstance().getImageMapManager().getAllImageMap().forEach(
                             (name, imageMap) -> removeImageForm.addButton(new ElementButton("Id: " + name + "\n" + imageMap.getImageName(), new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/items/painting.png")))
@@ -53,6 +53,11 @@ public class ImageNKCommand extends Command {
                         else remover.sendMessage("[ImageNK] §cFailed");
                     });
                     player.showFormWindow(removeImageForm);
+                }
+                case 2 -> {
+                    //要求图片源重载
+                    ImageNK.getInstance().imageMapManager.getProvider().reload();
+                    player.sendMessage("[ImageNK] §aImage source reloaded");
                 }
             }
         });
