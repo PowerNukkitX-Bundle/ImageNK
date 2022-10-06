@@ -76,7 +76,7 @@ public class ImageNK extends PluginBase implements Listener {
         //检查点击位置是否已存在地图画
         if (this.shouldBlockEventCancelled(event.getBlock())) {
             event.setCancelled();
-            if (!player.isOp() && !player.isCreative()) return;
+            if (!player.isOp() || !player.isCreative()) return;
             if (interactCoolDown.get(player) != null && currentTick - interactCoolDown.get(player) <= INTERACT_COOL_DOWN)
                 return;
             interactCoolDown.put(player, currentTick);
