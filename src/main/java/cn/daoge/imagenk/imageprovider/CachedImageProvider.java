@@ -27,25 +27,12 @@ public abstract class CachedImageProvider implements ImageProvider {
 
     @Override
     public void reload() {
-        cache();
-    }
-
-    /**
-     * 预缓存图片
-     */
-    public void cache() {
         this.cache = loadAll();
     }
 
     /**
-     * 清除缓存
-     */
-    public void clearCache() {
-        cache.clear();
-    }
-
-    /**
      * 加载所有图片
+     * 缓存实现需要覆写此方法
      */
     protected abstract Map<String, BufferedImage> loadAll();
 }

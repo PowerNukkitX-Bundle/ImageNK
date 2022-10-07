@@ -26,7 +26,13 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
 import lombok.Getter;
+import org.apache.commons.io.FileUtils;
+import oshi.util.FileUtil;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +60,7 @@ public class ImageNK extends PluginBase implements Listener {
         var dataPath = this.getDataFolder().toPath();
         var provider = new LocalImageProvider(dataPath.resolve("images"));
         //预缓存图片
-        provider.cache();
+        provider.reload();
         var storage = new LocalImageMapStorage(dataPath.resolve("data.json"));
         this.imageMapManager = new SimpleImageMapManager(storage, provider);
         var server = Server.getInstance();
@@ -173,15 +179,6 @@ public class ImageNK extends PluginBase implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        var player = event.getPlayer();
-        //清除缓存信息
-        interactCoolDown.remove(player);
-        pos1.remove(player);
-        pos1BlockFace.remove(player);
-    }
-
     public void giveImageMapItem(Player player, String imageName) {
         var item = Item.get(IMAGE_ITEM_ID);
         item.setCustomName(imageName);
@@ -190,18 +187,34 @@ public class ImageNK extends PluginBase implements Listener {
         player.giveItem(item);
     }
 
+    /**
+     * 注意此方法非异步，会阻塞线程
+     */
+    public void downloadImage(URL url, String saveName) throws IOException {
+        FileUtils.copyURLToFile(url, this.getDataFolder().toPath().resolve("images").resolve(saveName).toFile());
+    }
+
     @EventHandler
-    public void onBlockUpdate(BlockUpdateEvent event) {
+    protected void onPlayerQuit(PlayerQuitEvent event) {
+        var player = event.getPlayer();
+        //清除缓存信息
+        interactCoolDown.remove(player);
+        pos1.remove(player);
+        pos1BlockFace.remove(player);
+    }
+
+    @EventHandler
+    protected void onBlockUpdate(BlockUpdateEvent event) {
         event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
     }
 
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
+    protected void onBlockBreak(BlockBreakEvent event) {
         event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
     }
 
     @EventHandler
-    public void onItemFrameDrop(ItemFrameDropItemEvent event) {
+    protected void onItemFrameDrop(ItemFrameDropItemEvent event) {
         event.setCancelled(this.shouldBlockEventCancelled(event.getBlock()));
     }
 
