@@ -1,6 +1,6 @@
 name: ImageNK
 main: cn.daoge.imagenk.ImageNK
-version: "1.0.0"
+version: "1.0.1"
 api: ["1.0.13"]
 load: POSTWORLD
 author: "daoge_cmd"
