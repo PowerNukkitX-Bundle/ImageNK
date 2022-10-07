@@ -13,7 +13,7 @@ public class ImageNKCommand extends Command {
 
     @Override
     public boolean execute(CommandSender sender, String s, String[] strings) {
-        if (!sender.isPlayer()) {
+        if (!sender.isPlayer() || !sender.isOp()) {
             return false;
         }
 
