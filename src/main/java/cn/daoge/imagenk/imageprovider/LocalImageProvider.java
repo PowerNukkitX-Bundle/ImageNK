@@ -1,6 +1,7 @@
 package cn.daoge.imagenk.imageprovider;
 
 import cn.daoge.imagenk.ImageNK;
+import cn.nukkit.Player;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;
@@ -31,7 +32,7 @@ public class LocalImageProvider extends CachedImageProvider {
     }
 
     @Override
-    public Map<String, BufferedImage> loadAll() {
+    public Map<String, BufferedImage> loadAll(Player notifier) {
         var all = new HashMap<String, BufferedImage>();
         try (var stream = Files.walk(rootPath, 1)) {
             stream.filter(Files::isRegularFile).forEach(path -> {
@@ -43,11 +44,14 @@ public class LocalImageProvider extends CachedImageProvider {
                     throw new RuntimeException(e);
                 }
                 var logger = ImageNK.getInstance().getLogger();
+                String message;
                 if (image == null) {
-                    logger.warning("§cUnable to load image: §f" + name);
+                    logger.warning(message = "§cUnable to load image: §f" + name);
+                    if (notifier != null) notifier.sendMessage("[ImageNK] " + message);
                     return;
                 }
-                logger.info("§aSuccessfully load image: §f" + name);
+                logger.info(message = "§aSuccessfully load image: §f" + name);
+                if (notifier != null) notifier.sendMessage("[ImageNK] " + message);
                 all.put(name, image);
             });
         } catch (IOException e) {

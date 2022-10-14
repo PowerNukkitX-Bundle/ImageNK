@@ -354,7 +354,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 //填充模式
                 //预先将图片拉伸到指定大小，提高画面质量
                 var scaledInstance = image.getScaledInstance(width * 128, height * 128, Image.SCALE_SMOOTH);
-                var newImage = new BufferedImage(width * 128, height * 128, image.getType());
+                var newImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_4BYTE_ABGR);
                 var gr = newImage.getGraphics();
                 gr.drawImage(scaledInstance, 0, 0, null);
                 gr.dispose();
@@ -363,7 +363,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 BufferedImage[][] imgs = new BufferedImage[width][height];
                 for (int x = 0; x < width; ++x) {
                     for (int y = 0; y < height; ++y) {
-                        imgs[x][y] = new BufferedImage(128, 128, image.getType());
+                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_4BYTE_ABGR);
                         Graphics2D gr1 = imgs[x][y].createGraphics();
                         gr1.drawImage(image, 0, 0, 128, 128, 128 * x, 128 * y, 128 * x + 128, 128 * y + 128, null);
                         gr1.dispose();
@@ -371,27 +371,11 @@ public class SimpleImageMapManager implements ImageMapManager {
                 }
                 return imgs;
             }
-            case CENTER -> {
+            case CENTER, CENTER_FILL -> {
                 //居中模式
-                //计算背景色（通过混合所有像素的RGB）
-                long r = 0;
-                long g = 0;
-                long b = 0;
-                for (int imageX = 0; imageX < image.getWidth(); imageX++) {
-                    for (int imageY = 0; imageY < image.getHeight(); imageY++) {
-                        var color = new Color(image.getRGB(imageX, imageY));
-                        r += color.getRed();
-                        g += color.getGreen();
-                        b += color.getBlue();
-                    }
-                }
-                //总的像素数量
-                var pixelCount = ((long) (image.getWidth() + 1) * (long) (image.getHeight() + 1));
-                //计算出平均RGB
-                var backgroundColor = new Color((int) (r / pixelCount), (int) (g / pixelCount), (int) (b / pixelCount));
 
                 //新的正方形图片
-                var fullImage = new BufferedImage(width * 128, height * 128, image.getType());
+                var fullImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_4BYTE_ABGR);
 
                 //若分配的地图大小不够装下整个图片，需要缩放图片
                 if (image.getHeight() > fullImage.getHeight() || image.getWidth() > fullImage.getWidth()) {
@@ -404,7 +388,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                         k = (double) fullImage.getWidth() / (double) image.getWidth();
                     }
 
-                    var newImage = new BufferedImage((int) (k * image.getWidth()), (int) (k * image.getHeight()), image.getType());
+                    var newImage = new BufferedImage((int) (k * image.getWidth()), (int) (k * image.getHeight()), BufferedImage.TYPE_4BYTE_ABGR);
                     var gr = newImage.getGraphics();
                     gr.drawImage(image.getScaledInstance(newImage.getWidth(), newImage.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
                     gr.dispose();
@@ -416,10 +400,29 @@ public class SimpleImageMapManager implements ImageMapManager {
                 int offsetY = (fullImage.getHeight() - image.getHeight()) / 2;
 
                 var gr1 = fullImage.createGraphics();
-                //设置画笔颜色
-                gr1.setColor(backgroundColor);
-                //填充整个图像为背景色
-                gr1.fillRect(0, 0, fullImage.getWidth(), fullImage.getHeight());
+                if (mode == SplitMode.CENTER_FILL) {
+                    //填充空白
+                    //计算背景色（通过混合所有像素的RGB）
+                    long r = 0;
+                    long g = 0;
+                    long b = 0;
+                    for (int imageX = 0; imageX < image.getWidth(); imageX++) {
+                        for (int imageY = 0; imageY < image.getHeight(); imageY++) {
+                            var color = new Color(image.getRGB(imageX, imageY));
+                            r += color.getRed();
+                            g += color.getGreen();
+                            b += color.getBlue();
+                        }
+                    }
+                    //总的像素数量
+                    var pixelCount = ((long) (image.getWidth() + 1) * (long) (image.getHeight() + 1));
+                    //计算出平均RGB
+                    var backgroundColor = new Color((int) (r / pixelCount), (int) (g / pixelCount), (int) (b / pixelCount));
+                    //设置画笔颜色
+                    gr1.setColor(backgroundColor);
+                    //填充整个图像为背景色
+                    gr1.fillRect(0, 0, fullImage.getWidth(), fullImage.getHeight());
+                }
 
                 //将源图片复制到中间
                 gr1.drawImage(image,
@@ -430,7 +433,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 BufferedImage[][] imgs = new BufferedImage[width][height];
                 for (int x = 0; x < width; ++x) {
                     for (int y = 0; y < height; ++y) {
-                        imgs[x][y] = new BufferedImage(128, 128, fullImage.getType());
+                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_4BYTE_ABGR);
                         Graphics2D gr2 = imgs[x][y].createGraphics();
                         gr2.drawImage(fullImage, 0, 0, 128, 128, 128 * x, 128 * y, 128 * x + 128, 128 * y + 128, null);
                         gr2.dispose();
@@ -444,9 +447,17 @@ public class SimpleImageMapManager implements ImageMapManager {
     }
 
     public enum SplitMode {
-        //居中
-        CENTER,
+        //居中（空白部分留空）
+        CENTER("Center the image. Won't use the image average color to fill the blank area"),
         //填充
-        FILL
+        FILL("Scales the image to the given size"),
+        //居中同时使用平均颜色填充空白
+        CENTER_FILL("Center the image. Will use the image average color to fill the blank area");
+
+        public final String details;
+
+        SplitMode(String details) {
+            this.details = details;
+        }
     }
 }

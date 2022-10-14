@@ -67,7 +67,7 @@ public class ImageNKCommand extends Command {
                 case 2 -> {
                     //要求图片源重载
                     player.sendMessage("[ImageNK] §aStart reloading image source");
-                    ImageNK.getInstance().imageMapManager.getProvider().reload();
+                    ImageNK.getInstance().imageMapManager.getProvider().reload(player);
                     player.sendMessage("[ImageNK] §aImage source reloaded");
                 }
                 case 3 -> {
@@ -132,7 +132,7 @@ public class ImageNKCommand extends Command {
                             else {
                                 //重载图片源
                                 player.sendMessage("[ImageNK] §aStart reloading image source");
-                                ImageNK.getInstance().getImageMapManager().getProvider().reload();
+                                ImageNK.getInstance().getImageMapManager().getProvider().reload(player);
                                 player.sendMessage("[ImageNK] §aImage source reloaded");
                             }
                         });

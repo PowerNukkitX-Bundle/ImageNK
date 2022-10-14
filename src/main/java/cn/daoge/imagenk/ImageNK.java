@@ -27,12 +27,9 @@ import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.plugin.PluginBase;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
-import oshi.util.FileUtil;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,13 +82,15 @@ public class ImageNK extends PluginBase implements Listener {
             var imageMap = imageMapManager.getImageMapInPosition(event.getBlock());
             var information = new StringBuilder();
 
+            var pos1 = imageMap.getPos1();
+            var pos2 = imageMap.getPos2();
             information
                     .append("§fImageName: §a" + imageMap.getImageName() + "\n")
                     .append("§fImageId: §a" + imageMap.getId() + "\n")
                     .append("§fSplitMode: §a" + imageMap.getMode() + "\n")
                     .append("§fLevelName: §a" + imageMap.getLevelName() + "\n")
-                    .append("§fPos1: §a" + imageMap.getPos1() + "\n")
-                    .append("§fPos2: §a" + imageMap.getPos2());
+                    .append("§fPos1: §a" + pos1.x + " " + pos1.y + " " + pos1.z + "\n")
+                    .append("§fPos2: §a" + pos2.x + " " + pos2.y + " " + pos2.z);
 
             var imageMapInfoForm = new FormWindowSimple("ImageNK", information.toString());
             imageMapInfoForm.addButton(new ElementButton("Remove This Image", new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/ui/crossout.png")));
@@ -143,12 +142,21 @@ public class ImageNK extends PluginBase implements Listener {
             }
             player.sendMessage("[ImageNK] §aPos2 set at: §f" + interactVec.asBlockVector3() + "§a, spawning...");
 
-            var setIdAndModeForm = new FormWindowCustom("ImageNK");
-            setIdAndModeForm.addElement(new ElementInput("Image identifier: "));
-            setIdAndModeForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(SimpleImageMapManager.SplitMode.values()).map(Enum::name).toList()));
-            setIdAndModeForm.addElement(new ElementSlider("Compressibility: ", 0, 100, 1, 100));
-            setIdAndModeForm.addHandler((creator, i) -> {
-                var response = setIdAndModeForm.getResponse();
+            var setMapInfoForm = new FormWindowCustom("ImageNK");
+            setMapInfoForm.addElement(new ElementInput("Image identifier: "));
+            setMapInfoForm.addElement(new ElementDropdown("Image Mode: ", Arrays.stream(SimpleImageMapManager.SplitMode.values()).map(Enum::name).toList()));
+            setMapInfoForm.addElement(new ElementSlider("Compressibility: ", 0, 100, 1, 100));
+
+            //模式细节介绍
+            var infoStrBuilder = new StringBuilder();
+            for (var mode : SimpleImageMapManager.SplitMode.values()) {
+                var details = mode.details;
+                infoStrBuilder.append("§a" + mode.name() + " - §f" + details + "\n");
+            }
+            setMapInfoForm.addElement(new ElementLabel(infoStrBuilder.toString()));
+
+            setMapInfoForm.addHandler((creator, i) -> {
+                var response = setMapInfoForm.getResponse();
                 if (response == null) return;
                 //获取图片id和显示模式
                 var id = response.getInputResponse(0);
@@ -175,7 +183,7 @@ public class ImageNK extends PluginBase implements Listener {
                 else player.sendMessage("[ImageNK] §cFailed!");
             });
 
-            player.showFormWindow(setIdAndModeForm);
+            player.showFormWindow(setMapInfoForm);
         }
     }
 
