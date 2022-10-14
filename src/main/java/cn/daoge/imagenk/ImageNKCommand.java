@@ -38,7 +38,7 @@ public class ImageNKCommand extends Command {
                 case 0 -> {
                     //创建图片
                     var createImageForm = new FormWindowSimple("Create Image", "Choose an image");
-                    ImageNK.getInstance().getImageMapManager().getProvider().getAll().forEach(
+                    ImageNK.getInstance().getImageMapManager().getProvider().getAll().stream().sorted().forEach(
                             name -> createImageForm.addButton(new ElementButton(name, new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/items/painting.png")))
                     );
                     createImageForm.addHandler((creator, i1) -> {
