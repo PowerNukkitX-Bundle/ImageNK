@@ -354,7 +354,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 //填充模式
                 //预先将图片拉伸到指定大小，提高画面质量
                 var scaledInstance = image.getScaledInstance(width * 128, height * 128, Image.SCALE_SMOOTH);
-                var newImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_4BYTE_ABGR);
+                var newImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_INT_ARGB);
                 var gr = newImage.getGraphics();
                 gr.drawImage(scaledInstance, 0, 0, null);
                 gr.dispose();
@@ -363,7 +363,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 BufferedImage[][] imgs = new BufferedImage[width][height];
                 for (int x = 0; x < width; ++x) {
                     for (int y = 0; y < height; ++y) {
-                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_4BYTE_ABGR);
+                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
                         Graphics2D gr1 = imgs[x][y].createGraphics();
                         gr1.drawImage(image, 0, 0, 128, 128, 128 * x, 128 * y, 128 * x + 128, 128 * y + 128, null);
                         gr1.dispose();
@@ -375,7 +375,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 //居中模式
 
                 //新的正方形图片
-                var fullImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_4BYTE_ABGR);
+                var fullImage = new BufferedImage(width * 128, height * 128, BufferedImage.TYPE_INT_ARGB);
 
                 //若分配的地图大小不够装下整个图片，需要缩放图片
                 if (image.getHeight() > fullImage.getHeight() || image.getWidth() > fullImage.getWidth()) {
@@ -388,7 +388,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                         k = (double) fullImage.getWidth() / (double) image.getWidth();
                     }
 
-                    var newImage = new BufferedImage((int) (k * image.getWidth()), (int) (k * image.getHeight()), BufferedImage.TYPE_4BYTE_ABGR);
+                    var newImage = new BufferedImage((int) (k * image.getWidth()), (int) (k * image.getHeight()), BufferedImage.TYPE_INT_ARGB);
                     var gr = newImage.getGraphics();
                     gr.drawImage(image.getScaledInstance(newImage.getWidth(), newImage.getHeight(), Image.SCALE_SMOOTH), 0, 0, null);
                     gr.dispose();
@@ -433,7 +433,7 @@ public class SimpleImageMapManager implements ImageMapManager {
                 BufferedImage[][] imgs = new BufferedImage[width][height];
                 for (int x = 0; x < width; ++x) {
                     for (int y = 0; y < height; ++y) {
-                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_4BYTE_ABGR);
+                        imgs[x][y] = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
                         Graphics2D gr2 = imgs[x][y].createGraphics();
                         gr2.drawImage(fullImage, 0, 0, 128, 128, 128 * x, 128 * y, 128 * x + 128, 128 * y + 128, null);
                         gr2.dispose();
